@@ -21,7 +21,7 @@ if wezterm.config_builder then
 end
 
 config = {
-  font_size = 16.0,
+  font_size = 24.0,
   font = wezterm.font({
     family = "JetBrains Mono",
     -- disable ligatures

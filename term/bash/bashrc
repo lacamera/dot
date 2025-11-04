@@ -79,7 +79,7 @@ function _c() {
 _red=$(_c 31); _green=$(_c 32); _blue=$(_c 34); _reset=$(_c 0)
 
 function _update_prompt() {
-  local status
+  local status=""
   if [[ "${?}" -ne 0 ]]; then
     status="${_red}✖$exit${_reset} "
   fi
@@ -100,7 +100,8 @@ function _update_prompt() {
   out+="${parts[-1]}"
   printf '%s' "${out}"
 
-  PS1="${status}${_blue}$(_prompt_path)${_reset}${branch} \$ "
+  # PS1="${status}${_blue}$(_prompt_path)${_reset}${branch} \$ "
+  PS1="${status}${_blue}${_reset}${branch} \$ "
 }
 
 PROMPT_COMMAND=_update_prompt
