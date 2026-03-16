@@ -13,6 +13,20 @@ done
 rpath="$(realpath "$0")"
 prefix="$(dirname "${rpath}")/"
 xdg="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
+
+find "${xdg}" -type l 2>/dev/null | while read -r link
+do
+  target="$(readlink "${link}")"
+  case "${target}" in
+    "${prefix}"*)
+      if [ ! -e "${target}" ]; then
+        rm -f "${link}"
+      fi
+      ;;
+    *) ;;
+  esac
+done
+
 find "${prefix}"\
   ! -name "${self}"\
   ! -name "README.md" | while read -r target

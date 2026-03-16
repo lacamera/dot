@@ -1,158 +1,353 @@
 return {
-    "neovim/nvim-lspconfig",
-    dependencies = {
-        "williamboman/mason.nvim",
-        "williamboman/mason-lspconfig.nvim",
-        "hrsh7th/cmp-nvim-lsp",
-        "hrsh7th/cmp-buffer",
-        "hrsh7th/cmp-path",
-        "hrsh7th/cmp-cmdline",
-        "jcha0713/cmp-tw2css",
-        "hrsh7th/nvim-cmp",
+    {
+        "folke/lazydev.nvim",
+        ft = "lua",
+        opts = {},
     },
-
-    config = function()
-        -- Consistent ronding for boders
-        vim.diagnostic.config({
-            float = { border = "rounded" }
-        })
-
-        local cmp = require('cmp')
-        local cmp_lsp = require("cmp_nvim_lsp")
-        local capabilities = vim.tbl_deep_extend(
-            "force",
-            {},
-            vim.lsp.protocol.make_client_capabilities(),
-            cmp_lsp.default_capabilities())
-
-        require("mason").setup()
-        require("mason-lspconfig").setup({
-            automatic_installation = false,
-            ensure_installed = {
-                "lua_ls",
-                "gopls",
-                "ruby_lsp",
-                -- "rust_analyzer",
-                -- "tinymist",
+    {
+        "mason-org/mason.nvim",
+        cmd = { "Mason", "MasonInstall", "MasonUpdate" },
+        opts = {
+            ui = {
+                border = "rounded",
             },
-            handlers = {
-                function(server_name)
-                    require("lspconfig")[server_name].setup {
-                        capabilities = capabilities
-                    }
-                end,
-                ["svelte"] = function()
-                    require("lspconfig")["svelte"].setup({
-                        capabilities = capabilities,
-                        on_attach = function(client, bufnr)
-                            vim.api.nvim_create_autocmd("BufWritePost", {
-                                pattern = { "*.js", "*.ts" },
-                                callback = function(ctx)
-                                    -- this bad boy updates imports between svelte and ts/js files
-                                    client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
-                                end,
-                            })
-                        end
-                    })
-                end,
-                ["tinymist"] = function()
-                    require("lspconfig")["tinymist"].setup {
-                        capabilities = capabilities,
-                        settings = {
-                            formatterMode = "typstyle",
-                            exportPdf = "never"
-                        },
-                    }
-                end,
-                ["lua_ls"] = function()
-                    local lspconfig = require("lspconfig")
-                    lspconfig.lua_ls.setup {
-                        capabilities = capabilities,
-                        settings = {
-                            Lua = {
-                                runtime = { version = "Lua 5.1" },
-                                diagnostics = {
-                                    globals = { "bit", "vim", "it", "describe", "before_each", "after_each" },
-                                }
-                            }
-                        }
-                    }
-                end
-            }
-
-        })
-        local l = vim.lsp
-        l.handlers["textDocument/hover"] = function(_, result, ctx, config)
-            config = config or { border = "rounded", focusable = true }
-            config.focus_id = ctx.method
-            if not (result and result.contents) then
-                return
-            end
-            local markdown_lines = l.util.convert_input_to_markdown_lines(result.contents)
-            markdown_lines = vim.tbl_filter(function(line)
-                return line ~= ""
-            end, markdown_lines)
-            if vim.tbl_isempty(markdown_lines) then
-                return
-            end
-            return l.util.open_floating_preview(markdown_lines, "markdown", config)
-        end
-
-        local cmp_select = { behavior = cmp.SelectBehavior.Select }
-        vim.api.nvim_set_hl(0, "CmpNormal", {})
-        cmp.setup({
-            mapping = cmp.mapping.preset.insert({
-                ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-                ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-                ['<C-y>'] = cmp.mapping.confirm({ select = true }),
-                ['<C-e>'] = vim.NIL
-            }),
-
-            window = {
-                completion = {
-                    scrollbar = false,
+        },
+    },
+    {
+        "WhoIsSethDaniel/mason-tool-installer.nvim",
+        dependencies = { "mason-org/mason.nvim" },
+        opts = {
+            ensure_installed = {
+                "bash-language-server",
+                "gofumpt",
+                "goimports",
+                "gopls",
+                "lua-language-server",
+                "marksman",
+                "prettierd",
+                "ruff",
+                "ruby-lsp",
+                "rust-analyzer",
+                "shfmt",
+                "stylua",
+                "svelte-language-server",
+                "tinymist",
+                "typstyle",
+                "yaml-language-server",
+            },
+            run_on_start = true,
+        },
+    },
+    {
+        "saghen/blink.cmp",
+        version = "1.*",
+        event = { "InsertEnter", "CmdlineEnter" },
+        dependencies = { "rafamadriz/friendly-snippets" },
+        opts = {
+            keymap = { preset = "default" },
+            appearance = {
+                nerd_font_variant = "mono",
+            },
+            completion = {
+                list = {
+                    selection = {
+                        preselect = false,
+                        auto_insert = true,
+                    },
+                },
+                menu = {
+                    auto_show = true,
                     border = "rounded",
-                    winhighlight = "Normal:CmpNormal",
+                    draw = {
+                        columns = {
+                            { "kind_icon" },
+                            { "label", "label_description", gap = 1 },
+                        },
+                    },
                 },
                 documentation = {
-                    scrollbar = false,
-                    border = "rounded",
-                    winhighlight = "Normal:CmpNormal",
-                }
-            },
-            sources = cmp.config.sources({
-                {
-                    name = "nvim_lsp",
-                    entry_filter = function(entry, ctx)
-                        return require("cmp").lsp.CompletionItemKind.Snippet ~= entry:get_kind()
-                    end,
+                    auto_show = true,
+                    auto_show_delay_ms = 200,
+                    window = {
+                        border = "rounded",
+                    },
                 },
-                { name = 'cmp-tw2css' },
-            }, {})
-        })
+                ghost_text = {
+                    enabled = true,
+                },
+            },
+            signature = {
+                enabled = true,
+                window = {
+                    border = "rounded",
+                },
+            },
+            cmdline = {
+                keymap = { preset = "cmdline" },
+                completion = {
+                    menu = {
+                        auto_show = true,
+                    },
+                },
+            },
+            sources = {
+                default = { "lsp", "path", "snippets", "buffer" },
+            },
+            fuzzy = {
+                implementation = "prefer_rust_with_warning",
+            },
+        },
+        opts_extend = { "sources.default" },
+    },
+    {
+        "stevearc/conform.nvim",
+        event = { "BufWritePre" },
+        cmd = { "ConformInfo" },
+        opts = {
+            notify_on_error = false,
+            format_on_save = function(bufnr)
+                if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+                    return
+                end
+                return {
+                    timeout_ms = 1000,
+                    lsp_format = "fallback",
+                }
+            end,
+            formatters_by_ft = {
+                bash = { "shfmt" },
+                css = { "prettierd", "prettier" },
+                go = { "goimports", "gofumpt" },
+                html = { "prettierd", "prettier" },
+                javascript = { "prettierd", "prettier" },
+                javascriptreact = { "prettierd", "prettier" },
+                json = { "prettierd", "prettier" },
+                lua = { "stylua" },
+                markdown = { "prettierd", "prettier" },
+                python = { "ruff_format" },
+                ruby = { "rubocop" },
+                rust = { "rustfmt" },
+                sh = { "shfmt" },
+                svelte = { "prettierd", "prettier" },
+                toml = { "taplo" },
+                typescript = { "prettierd", "prettier" },
+                typescriptreact = { "prettierd", "prettier" },
+                typst = { "typstyle" },
+                yaml = { "prettierd", "prettier" },
+                zsh = { "shfmt" },
+            },
+        },
+    },
+    {
+        "folke/trouble.nvim",
+        cmd = "Trouble",
+        keys = {
+            { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics" },
+            { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer diagnostics" },
+            { "<leader>xs", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Symbols" },
+            { "<leader>xq", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix" },
+            { "<leader>xl", "<cmd>Trouble loclist toggle<cr>", desc = "Loclist" },
+        },
+        opts = {
+            focus = true,
+            warn_no_results = false,
+        },
+    },
+    {
+        "neovim/nvim-lspconfig",
+        event = { "BufReadPre", "BufNewFile" },
+        dependencies = {
+            "folke/lazydev.nvim",
+            "mason-org/mason.nvim",
+            "saghen/blink.cmp",
+        },
+        config = function()
+            local capabilities = require("blink.cmp").get_lsp_capabilities({
+                textDocument = {
+                    foldingRange = {
+                        dynamicRegistration = false,
+                        lineFoldingOnly = true,
+                    },
+                },
+            })
 
+            vim.diagnostic.config({
+                severity_sort = true,
+                underline = true,
+                update_in_insert = false,
+                virtual_text = false,
+                float = {
+                    border = "rounded",
+                    source = "if_many",
+                },
+                jump = {
+                    float = true,
+                },
+                signs = {
+                    text = {
+                        [vim.diagnostic.severity.ERROR] = " ",
+                        [vim.diagnostic.severity.WARN] = " ",
+                        [vim.diagnostic.severity.INFO] = " ",
+                        [vim.diagnostic.severity.HINT] = " ",
+                    },
+                },
+            })
 
-        local autocmd = vim.api.nvim_create_autocmd
-        autocmd({ "BufEnter", "BufWinEnter" }, {
-            pattern = { "*.vert", "*.frag" },
-            callback = function(e)
-                vim.cmd("set filetype=glsl")
+            local servers = {
+                bashls = {},
+                gopls = {
+                    settings = {
+                        gopls = {
+                            gofumpt = true,
+                            hints = {
+                                assignVariableTypes = true,
+                                compositeLiteralFields = true,
+                                compositeLiteralTypes = true,
+                                constantValues = true,
+                                functionTypeParameters = true,
+                                parameterNames = true,
+                                rangeVariableTypes = true,
+                            },
+                        },
+                    },
+                },
+                lua_ls = {
+                    settings = {
+                        Lua = {
+                            completion = {
+                                callSnippet = "Replace",
+                            },
+                            diagnostics = {
+                                globals = { "vim" },
+                            },
+                            hint = {
+                                enable = true,
+                            },
+                            runtime = {
+                                version = "LuaJIT",
+                            },
+                            workspace = {
+                                checkThirdParty = false,
+                                library = vim.api.nvim_get_runtime_file("", true),
+                            },
+                        },
+                    },
+                },
+                marksman = {},
+                ruby_lsp = {},
+                rust_analyzer = {
+                    settings = {
+                        ["rust-analyzer"] = {
+                            cargo = {
+                                allFeatures = true,
+                            },
+                            check = {
+                                command = "clippy",
+                            },
+                        },
+                    },
+                },
+                svelte = {},
+                tinymist = {
+                    settings = {
+                        formatterMode = "typstyle",
+                        exportPdf = "never",
+                    },
+                },
+                yamlls = {},
+            }
+
+            vim.lsp.config("*", {
+                capabilities = capabilities,
+            })
+
+            for server, config in pairs(servers) do
+                vim.lsp.config(server, config)
+                vim.lsp.enable(server)
             end
 
-        })
+            local attach_group = vim.api.nvim_create_augroup("custom_lsp_attach", { clear = true })
 
-        autocmd('LspAttach', {
-            callback = function(e)
-                local opts = { buffer = e.buf }
-                vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-                vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
-                vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format)
-                vim.keymap.set("n", "<leader>la", function() vim.lsp.buf.code_action() end, opts)
-                vim.keymap.set("n", "<leader>lr", function() vim.lsp.buf.rename() end, opts)
-                vim.keymap.set("n", "<leader>lk", function() vim.diagnostic.open_float() end, opts)
-                vim.keymap.set("n", "<leader>ln", function() vim.diagnostic.goto_next() end, opts)
-                vim.keymap.set("n", "<leader>lp", function() vim.diagnostic.goto_prev() end, opts)
-            end
-        })
-    end
+            vim.api.nvim_create_autocmd("BufWritePost", {
+                group = vim.api.nvim_create_augroup("custom_svelte_watch", { clear = true }),
+                pattern = { "*.js", "*.ts" },
+                callback = function(ctx)
+                    for _, client in ipairs(vim.lsp.get_clients({ name = "svelte" })) do
+                        client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
+                    end
+                end,
+            })
+
+            vim.api.nvim_create_autocmd("LspAttach", {
+                group = attach_group,
+                callback = function(event)
+                    local client = vim.lsp.get_client_by_id(event.data.client_id)
+                    if not client then
+                        return
+                    end
+
+                    local map = function(mode, lhs, rhs, desc)
+                        vim.keymap.set(mode, lhs, rhs, { buffer = event.buf, desc = desc, silent = true })
+                    end
+
+                    local telescope = function(method, opts)
+                        return function()
+                            require("telescope.builtin")[method](opts or {})
+                        end
+                    end
+
+                    map("n", "gd", telescope("lsp_definitions"), "Goto definition")
+                    map("n", "gr", telescope("lsp_references"), "Goto references")
+                    map("n", "gi", telescope("lsp_implementations"), "Goto implementation")
+                    map("n", "gt", telescope("lsp_type_definitions"), "Goto type definition")
+                    map("n", "K", vim.lsp.buf.hover, "Hover")
+                    map("n", "gK", vim.lsp.buf.signature_help, "Signature help")
+                    map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code action")
+                    map("n", "<leader>cr", vim.lsp.buf.rename, "Rename")
+                    map("n", "<leader>cf", function()
+                        require("conform").format({
+                            async = false,
+                            lsp_format = "fallback",
+                        })
+                    end, "Format buffer")
+                    map("n", "<leader>cd", vim.diagnostic.open_float, "Line diagnostics")
+                    map("n", "<leader>cD", telescope("diagnostics", { bufnr = 0 }), "Buffer diagnostics")
+                    map("n", "<leader>cs", telescope("lsp_document_symbols"), "Document symbols")
+                    map("n", "<leader>cS", telescope("lsp_workspace_symbols"), "Workspace symbols")
+                    map("n", "[d", function()
+                        vim.diagnostic.jump({ count = -1, float = true })
+                    end, "Previous diagnostic")
+                    map("n", "]d", function()
+                        vim.diagnostic.jump({ count = 1, float = true })
+                    end, "Next diagnostic")
+                    map("n", "<leader>ci", function()
+                        local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf })
+                        vim.lsp.inlay_hint.enable(not enabled, { bufnr = event.buf })
+                    end, "Toggle inlay hints")
+
+                    if client:supports_method("textDocument/documentHighlight") then
+                        local highlight_group = vim.api.nvim_create_augroup("custom_lsp_highlight_" .. event.buf, {
+                            clear = true,
+                        })
+
+                        vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+                            group = highlight_group,
+                            buffer = event.buf,
+                            callback = vim.lsp.buf.document_highlight,
+                        })
+
+                        vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "LspDetach" }, {
+                            group = highlight_group,
+                            buffer = event.buf,
+                            callback = vim.lsp.buf.clear_references,
+                        })
+                    end
+
+                    if client:supports_method("textDocument/inlayHint") then
+                        vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+                    end
+                end,
+            })
+        end,
+    },
 }

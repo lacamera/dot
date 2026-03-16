@@ -1,25 +1,38 @@
 return {
-    "sylvanfranklin/omni-preview.nvim",
-    dependencies = {
-        { "toppair/peek.nvim",            lazy = true, build = "deno task --quiet build:fast" }, -- markdown
-        { 'chomosuke/typst-preview.nvim', lazy = true },                                         -- typst
-        { 'hat0uma/csvview.nvim',         lazy = true },                                         -- csv
-    },
-    config = function()
-        require("omni-preview").setup()
-        require("typst-preview").setup({
-            dependencies_bin = {
-                ['tinymist'] = "/Users/sylvanfranklin/.cargo/bin/tinymist",
-                ['websocat'] = nil
+    {
+        "sylvanfranklin/omni-preview.nvim",
+        cmd = "OmniPreview",
+        keys = {
+            { "<leader>op", "<cmd>OmniPreview start<cr>", desc = "Start preview" },
+            { "<leader>oP", "<cmd>OmniPreview stop<cr>", desc = "Stop preview" },
+        },
+        dependencies = {
+            {
+                "toppair/peek.nvim",
+                build = function(plugin)
+                    if vim.fn.executable("deno") == 1 then
+                        vim.system({ "deno", "task", "--quiet", "build:fast" }, { cwd = plugin.dir }):wait()
+                    end
+                end,
             },
-        })
-
-        require("peek").setup({ app = "browser" })
-        require("csvview").setup({
+            {
+                "chomosuke/typst-preview.nvim",
+                ft = "typst",
+                opts = {},
+            },
+        },
+        config = function()
+            require("omni-preview").setup()
+            require("peek").setup({ app = "browser" })
+        end,
+    },
+    {
+        "hat0uma/csvview.nvim",
+        ft = "csv",
+        opts = {
             view = {
-                display_mode = "border"
-            }
-        })
-        vim.keymap.set("n", "<leader>p", ":OmniPreview start<CR>", { silent = true })
-    end
+                display_mode = "border",
+            },
+        },
+    },
 }

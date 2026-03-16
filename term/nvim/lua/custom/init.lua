@@ -1,3 +1,7 @@
-require "custom.opts"
-require "custom.keys"
-require "custom.lazy"
+require("custom.core.globals")
+require("custom.core.options")
+require("custom.core.autocmds")
+require("custom.core.statusline")
+require("custom.typst")
+require("custom.lazy")
+require("custom.core.keymaps")

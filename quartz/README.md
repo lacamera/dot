@@ -17,7 +17,33 @@ Initialize Homebrew in your shell:
 eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
-```
+```sh
 brew install koekeishiya/formulae/skhd
+./quartz/setup
 skhd --start-service
 ```
+
+This repo ships a default `skhd` binding:
+
+```text
+shift + alt - t
+```
+
+That hotkey toggles macOS Light/Dark appearance and then reloads tmux so your synced Gruvbox light/dark themes follow along.
+
+After installation:
+
+```sh
+skhd --reload
+```
+
+You will also need to grant Accessibility permissions to `skhd` in:
+
+```text
+System Settings -> Privacy & Security -> Accessibility
+```
+
+Notes:
+- WezTerm should follow macOS appearance automatically
+- tmux is reloaded by the toggle script
+- Neovim updates on focus/resume, or immediately with `:ThemeSync`
