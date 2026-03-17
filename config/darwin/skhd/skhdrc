@@ -1,2 +1,0 @@
-cmd - return : /opt/homebrew/bin/wezterm
-shift + alt - t : /bin/sh ~/.config/skhd/appearance.sh

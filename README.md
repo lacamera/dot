@@ -33,5 +33,5 @@ darwin-rebuild switch --flake .#macbook
 
 - This is a structure-first migration, not a fully customized package manifest yet.
 - Existing config sources now live under `config/` so modules can stay small and declarative.
-- `git`, `ssh`, `tmux`, and `neovim` are now primarily declared through Home Manager modules.
-- `wezterm`, `opencode`, most of `bash`, and app-specific configs still use sourced files where that is simpler.
+- `git`, `ssh`, `tmux`, `neovim`, `aerospace`, `skhd`, and `mpv` are now primarily declared through Home Manager modules.
+- `wezterm`, `opencode`, and most of `bash` still use sourced files where that is simpler.
