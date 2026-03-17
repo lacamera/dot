@@ -1,5 +1,0 @@
-Host amd64
-  HostName 192.168.0.241
-  IdentityFile ~/.ssh/id_ed25519
-  User root
-
