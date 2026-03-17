@@ -9,7 +9,6 @@ macOS-first dotfiles scaffolded for a `nix-darwin` + `home-manager` migration.
 - `modules/darwin`: macOS system modules for `nix-darwin`
 - `modules/home`: user-level modules for `home-manager`
 - `modules/shared`: shared defaults and package placeholders
-- `config/darwin`: raw macOS app configs
 - `config/home`: raw user config files managed by Home Manager
 - `archive`: retired Linux, font, and legacy setup assets
 
@@ -32,6 +31,6 @@ darwin-rebuild switch --flake .#macbook
 ## Notes
 
 - This is a structure-first migration, not a fully customized package manifest yet.
-- Existing config sources now live under `config/` so modules can stay small and declarative.
-- `git`, `ssh`, `tmux`, `neovim`, `aerospace`, `skhd`, and `mpv` are now primarily declared through Home Manager modules.
-- `wezterm`, `opencode`, and most of `bash` still use sourced files where that is simpler.
+- Existing user config sources live under `config/` where keeping the upstream file format is simpler.
+- `git`, `ssh`, `tmux`, `neovim`, `aerospace`, `skhd`, and `mpv` are now declared directly in Home Manager modules.
+- `wezterm`, `opencode`, `nvim`, and `bashrc` still use sourced files where that is simpler.
