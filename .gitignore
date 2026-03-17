@@ -1,2 +1,5 @@
 .DS_Store
 .env*
+result
+.direnv/
+config/home/opencode/node_modules/
